@@ -102,11 +102,12 @@
             opacity: 0;
             transition: opacity 1s ease;
             font-size: 32px;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-shadow: none;
             width: 100%;
             padding: 0 20px;
             pointer-events: none;
             z-index: 100;
+            color: #000;
         }
 
         .final-content {
@@ -288,11 +289,11 @@
             }
 
             // Final phase - rapid glitches
-            const fastGlitches = [
-                1, 2, 3, 4, 2, 3, 1, 4, 2, 3,
-                1, 4, 2, 3, 1, 2, 4, 3, 2, 1,
-                4, 2, 1, 3, 4, 2, 1, 4, 3, 2
-            ];
+            const fastGlitches = [];
+            // Generate a longer sequence of rapid glitches
+            for (let i = 0; i < 60; i++) {
+                fastGlitches.push(Math.floor(Math.random() * 4) + 1);
+            }
 
             for (let i = 0; i < fastGlitches.length; i++) {
                 document.querySelectorAll('.logo').forEach(logo => {
@@ -304,30 +305,30 @@
                 currentLogo.classList.add('active');
                 currentLogo.classList.add('glitching');
                 
-                const scale = 1.3 + (i * 0.03);
-                const brightness = 1.5 + (i * 0.1);
-                const blur = i * 0.3;
+                // Increase scale and brightness more dramatically
+                const scale = 1.3 + (i * 0.05);
+                const brightness = 1.5 + (i * 0.15);
+                const blur = i * 0.4;
                 currentLogo.style.transform = `scale(${scale})`;
                 currentLogo.style.filter = `brightness(${brightness}) blur(${blur}px)`;
                 
-                await new Promise(resolve => setTimeout(resolve, Math.max(50, 150 - (i * 4))));
+                // Make it faster as it progresses
+                await new Promise(resolve => setTimeout(resolve, Math.max(20, 100 - (i * 1.5))));
             }
 
-            // Final flash without showing base logo
-            await new Promise(resolve => setTimeout(resolve, 400));
+            // Immediate flash without pause
             flash.classList.add('active');
 
-            // Wait for flash to complete
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Quick transition to white
+            await new Promise(resolve => setTimeout(resolve, 300));
 
             // Switch to white mode and clean up
             document.body.classList.add('white-mode');
             logoContainer.style.opacity = '0';
-            await new Promise(resolve => setTimeout(resolve, 500));
             logoContainer.style.display = 'none';
 
-            // Significant pause before starting text sequence
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Shorter pause before starting text sequence
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
             // Show text sequence with proper fashion-focused content
             const texts = [
@@ -345,10 +346,9 @@
             for (let text of texts) {
                 textContent.style.opacity = '0';
                 textContent.textContent = text;
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(resolve => setTimeout(resolve, 300));
                 textContent.style.opacity = '1';
-                await new Promise(resolve => setTimeout(resolve, 2500));
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
             
             // Hide text content and show final content
