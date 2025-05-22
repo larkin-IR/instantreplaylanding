@@ -313,16 +313,11 @@
                 await new Promise(resolve => setTimeout(resolve, Math.max(50, 150 - (i * 4))));
             }
 
-            // Final explosion effect
-            baselogo.style.display = 'block';
-            baselogo.classList.add('active');
-            baselogo.classList.add('explosion');
-
-            // Add flash effect
+            // Final flash without showing base logo
             await new Promise(resolve => setTimeout(resolve, 400));
             flash.classList.add('active');
 
-            // Wait for explosion and flash to complete
+            // Wait for flash to complete
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             // Switch to white mode and clean up
@@ -334,6 +329,18 @@
             // Significant pause before starting text sequence
             await new Promise(resolve => setTimeout(resolve, 2000));
             
+            // Show text sequence with proper fashion-focused content
+            const texts = [
+                "Imagine the thrill of thrifting...",
+                "The rush of bidding...",
+                "The satisfaction of scoring...",
+                "All in one place.",
+                "Too good to be true?",
+                "We will see.",
+                "Blink and you'll miss it.",
+                "Coming soon..."
+            ];
+            
             // Show text sequence
             for (let text of texts) {
                 textContent.style.opacity = '0';
@@ -341,6 +348,7 @@
                 await new Promise(resolve => setTimeout(resolve, 500));
                 textContent.style.opacity = '1';
                 await new Promise(resolve => setTimeout(resolve, 2500));
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
             
             // Hide text content and show final content
