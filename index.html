@@ -177,23 +177,25 @@
         }
 
     <body>
-        <div id="flash" class="flash"></div>
-        <div id="logo-container">
-            <img src="assets/logo.png" alt="Base Logo" id="baselogo" class="logo active">
-            <img src="assets/glitch1.png" alt="Glitch 1" class="logo">
-            <img src="assets/glitch2.png" alt="Glitch 2" class="logo">
-            <img src="assets/glitch3.png" alt="Glitch 3" class="logo">
-            <img src="assets/glitch4.png" alt="Glitch 4" class="logo">
-        </div>
-        <div id="text-content" class="text-content"></div>
-        <div id="final-content" class="final-content">
-            <h1>InstantReplay</h1>
-            <p>Coming Soon</p>
+        <div class="container">
+            <div class="flash" id="flash"></div>
+            <div id="logo-container">
+                <img src="assets/baselogo.png" id="logo-base" class="logo active" alt="InstantReplay Logo">
+                <img src="assets/glitch1.png" id="logo-glitch1" class="logo" alt="InstantReplay Logo Glitch 1">
+                <img src="assets/glitch2.png" id="logo-glitch2" class="logo" alt="InstantReplay Logo Glitch 2">
+                <img src="assets/glitch3.png" id="logo-glitch3" class="logo" alt="InstantReplay Logo Glitch 3">
+                <img src="assets/glitch4.png" id="logo-glitch4" class="logo" alt="InstantReplay Logo Glitch 4">
+            </div>
+            <div id="text-content" class="text-content"></div>
+            <div id="final-content" class="final-content">
+                <h1>InstantReplay</h1>
+                <p>Coming Soon</p>
+            </div>
         </div>
 
     <script>
         const logoContainer = document.getElementById('logo-container');
-        const baselogo = document.getElementById('baselogo');
+        const baselogo = document.getElementById('logo-base');
         const logos = document.querySelectorAll('.logo');
         const textContent = document.getElementById('text-content');
         const finalContent = document.getElementById('final-content');
@@ -211,6 +213,7 @@
             finalContent.style.display = 'none';
             setTimeout(glitchEffect, 1000);
         });
+        logoContainer.addEventListener('click', glitchEffect);
     </script>
 
     <style>
