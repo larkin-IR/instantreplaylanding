@@ -1,1 +1,266 @@
 <!DOCTYPE html>...
+
+        .flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1000;
+            transition: opacity 0.8s ease;
+        }
+
+        .flash.active {
+            opacity: 1;
+        }
+
+        @keyframes glitchPulse {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.05); filter: brightness(1.2); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+
+        .glitching {
+            animation: glitchPulse 0.2s infinite;
+        }
+
+        .text-content {
+            position: absolute;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            font-size: 32px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            padding: 0 20px;
+            pointer-events: none;
+            z-index: 100;
+            transform: translateY(20px);
+        }
+
+        .text-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 1.5s ease, transform 1.5s ease;
+        }
+
+        async function glitchEffect() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const flash = document.getElementById('flash');
+
+            // Remove pulse animation from base logo
+            baselogo.style.animation = 'none';
+            baselogo.classList.remove('active');
+            baselogo.style.display = 'none';
+
+            // Initial build-up phase - very slow and subtle
+            const initialGlitches = [1, 2, 3, 4];
+            for (let i = 0; i < 6; i++) {
+                for (const glitchNum of initialGlitches) {
+                    logos.forEach(logo => {
+                        logo.style.display = 'none';
+                        logo.classList.remove('active');
+                        logo.classList.remove('glitching');
+                    });
+                    const currentLogo = logos[glitchNum];
+                    currentLogo.style.display = 'block';
+                    currentLogo.classList.add('active');
+                    
+                    // Very subtle initial effects
+                    const scale = 1 + (i * 0.01);
+                    const brightness = 1 + (i * 0.02);
+                    currentLogo.style.transform = `scale(${scale})`;
+                    currentLogo.style.filter = `brightness(${brightness})`;
+                    
+                    // Slower initial timing
+                    await new Promise(resolve => setTimeout(resolve, 400 - (i * 40)));
+                }
+            }
+
+            // Middle phase - building intensity
+            for (let i = 0; i < 5; i++) {
+                for (const glitchNum of initialGlitches) {
+                    const currentLogo = logos[glitchNum];
+                    logos.forEach(logo => {
+                        logo.style.display = 'none';
+                        logo.classList.remove('active');
+                    });
+                    currentLogo.style.display = 'block';
+                    currentLogo.classList.add('active');
+                    currentLogo.classList.add('glitching');
+                    
+                    const scale = 1.1 + (i * 0.04);
+                    const brightness = 1.2 + (i * 0.08);
+                    currentLogo.style.transform = `scale(${scale})`;
+                    currentLogo.style.filter = `brightness(${brightness})`;
+                    
+                    await new Promise(resolve => setTimeout(resolve, 250 - (i * 30)));
+                }
+            }
+
+            // Final phase - rapid glitches
+            const fastGlitches = [
+                1, 2, 3, 4, 2, 3, 1, 4, 2, 3,
+                1, 4, 2, 3, 1, 2, 4, 3, 2, 1,
+                4, 2, 1, 3, 4, 2, 1, 4, 3, 2,
+                1, 4, 2, 3, 1, 2, 4, 3, 2, 1
+            ];
+
+            for (let i = 0; i < fastGlitches.length; i++) {
+                logos.forEach(logo => {
+                    logo.style.display = 'none';
+                    logo.classList.remove('active');
+                });
+                const currentLogo = logos[fastGlitches[i]];
+                currentLogo.style.display = 'block';
+                currentLogo.classList.add('active');
+                currentLogo.classList.add('glitching');
+                
+                const scale = 1.3 + (i * 0.02);
+                const brightness = 1.5 + (i * 0.08);
+                const blur = i * 0.2;
+                currentLogo.style.transform = `scale(${scale})`;
+                currentLogo.style.filter = `brightness(${brightness}) blur(${blur}px)`;
+                
+                await new Promise(resolve => setTimeout(resolve, Math.max(40, 120 - (i * 2))));
+            }
+
+            // Final explosion effect
+            baselogo.style.display = 'block';
+            baselogo.classList.add('active');
+            baselogo.classList.add('explosion');
+
+            // Add flash effect with delay
+            await new Promise(resolve => setTimeout(resolve, 400));
+            flash.classList.add('active');
+
+            // Wait for explosion and flash to complete
+            await new Promise(resolve => setTimeout(resolve, 1200));
+
+            // Switch to white mode and clean up
+            document.body.classList.add('white-mode');
+            logoContainer.style.opacity = '0';
+            await new Promise(resolve => setTimeout(resolve, 800));
+            logoContainer.style.display = 'none';
+            flash.style.opacity = '0';
+
+            // Significant pause before starting text sequence
+            await new Promise(resolve => setTimeout(resolve, 2500));
+            
+            // Show text sequence
+            for (let text of texts) {
+                textContent.style.opacity = '0';
+                textContent.style.transform = 'translateY(20px)';
+                textContent.textContent = text;
+                await new Promise(resolve => setTimeout(resolve, 800));
+                textContent.classList.add('visible');
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                textContent.classList.remove('visible');
+                await new Promise(resolve => setTimeout(resolve, 800));
+            }
+            
+            // Hide text content and show final content
+            textContent.style.opacity = '0';
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Show final content
+            finalContent.style.display = 'flex';
+            await new Promise(resolve => setTimeout(resolve, 100));
+            finalContent.style.opacity = '1';
+            
+            isAnimating = false;
+        }
+
+    <body>
+        <div id="flash" class="flash"></div>
+        <div id="logo-container">
+            <img src="assets/logo.png" alt="Base Logo" id="baselogo" class="logo active">
+            <img src="assets/glitch1.png" alt="Glitch 1" class="logo">
+            <img src="assets/glitch2.png" alt="Glitch 2" class="logo">
+            <img src="assets/glitch3.png" alt="Glitch 3" class="logo">
+            <img src="assets/glitch4.png" alt="Glitch 4" class="logo">
+        </div>
+        <div id="text-content" class="text-content"></div>
+        <div id="final-content" class="final-content">
+            <h1>InstantReplay</h1>
+            <p>Coming Soon</p>
+        </div>
+
+    <script>
+        const logoContainer = document.getElementById('logo-container');
+        const baselogo = document.getElementById('baselogo');
+        const logos = document.querySelectorAll('.logo');
+        const textContent = document.getElementById('text-content');
+        const finalContent = document.getElementById('final-content');
+        let isAnimating = false;
+
+        const texts = [
+            "Capture your greatest gaming moments",
+            "Share them instantly with your friends",
+            "Never miss a highlight again",
+            "InstantReplay - Your gaming story, told better"
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            finalContent.style.opacity = '0';
+            finalContent.style.display = 'none';
+            setTimeout(glitchEffect, 1000);
+        });
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #000;
+            transition: background-color 1s ease;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        body.white-mode {
+            background: #fff;
+        }
+
+        .final-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #000;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            display: none;
+        }
+
+        .final-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .final-content p {
+            font-size: 24px;
+            opacity: 0.8;
+        }
+
+        @keyframes explosion {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.5); filter: brightness(2); }
+            100% { transform: scale(2); filter: brightness(3); opacity: 0; }
+        }
+
+        .explosion {
+            animation: explosion 0.8s forwards;
+        }
+    </style>
