@@ -39,16 +39,9 @@
 
         #logo-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 600px;
+            height: 600px;
             cursor: pointer;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.05); filter: brightness(1.2); }
-            100% { transform: scale(1); filter: brightness(1); }
         }
 
         .logo {
@@ -57,30 +50,24 @@
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0;
-            mix-blend-mode: screen;
-            transition: all 0.05s linear;
+            object-fit: contain;
+            display: none;
         }
 
         .logo.active {
-            opacity: 1;
+            display: block;
         }
 
-        .logo-base {
-            opacity: 1;
-            mix-blend-mode: normal;
+        #logo-base {
+            display: block;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
         }
 
-        .logo-red {
-            filter: url(#red-filter);
-        }
-
-        .logo-green {
-            filter: url(#green-filter);
-        }
-
-        .logo-blue {
-            filter: url(#blue-filter);
+        @keyframes pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.8)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3)); }
         }
 
         .text-content {
@@ -142,52 +129,22 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
         }
 
-        /* Glitch cut effect */
-        .cut {
-            position: absolute;
-            background: #fff;
-            width: 100%;
-            height: 2px;
-            opacity: 0;
-            transform: scaleX(0);
-            transform-origin: left;
-        }
-
-        @keyframes cutAcross {
-            0% { transform: scaleX(0); opacity: 1; }
-            100% { transform: scaleX(1); opacity: 1; }
+        @media (max-width: 768px) {
+            #logo-container {
+                width: 300px;
+                height: 300px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- SVG Filters for RGB split effect -->
-    <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <filter id="red-filter">
-                <feColorMatrix type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
-                <feOffset dx="5" dy="-3"/>
-            </filter>
-            <filter id="green-filter">
-                <feColorMatrix type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
-                <feOffset dx="-4" dy="3"/>
-            </filter>
-            <filter id="blue-filter">
-                <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
-                <feOffset dx="2" dy="2"/>
-            </filter>
-        </defs>
-    </svg>
-
     <div class="container">
         <div id="logo-container">
-            <img src="logo.svg" class="logo logo-base" alt="InstantReplay Logo">
-            <img src="logo.svg" class="logo logo-red" alt="InstantReplay Logo Red">
-            <img src="logo.svg" class="logo logo-green" alt="InstantReplay Logo Green">
-            <img src="logo.svg" class="logo logo-blue" alt="InstantReplay Logo Blue">
-            <!-- Glitch cut lines -->
-            <div class="cut" style="top: 30%;"></div>
-            <div class="cut" style="top: 50%;"></div>
-            <div class="cut" style="top: 70%;"></div>
+            <img src="assets/baselogo.png" id="logo-base" class="logo" alt="InstantReplay Logo">
+            <img src="assets/glitch1.png" id="logo-glitch1" class="logo" alt="InstantReplay Logo Glitch 1">
+            <img src="assets/glitch2.png" id="logo-glitch2" class="logo" alt="InstantReplay Logo Glitch 2">
+            <img src="assets/glitch3.png" id="logo-glitch3" class="logo" alt="InstantReplay Logo Glitch 3">
+            <img src="assets/glitch4.png" id="logo-glitch4" class="logo" alt="InstantReplay Logo Glitch 4">
         </div>
         <div class="text-content" id="textContent"></div>
         <div class="final-content" id="finalContent">
@@ -216,88 +173,45 @@
         const textContent = document.getElementById('textContent');
         const finalContent = document.getElementById('finalContent');
         const logos = document.querySelectorAll('.logo');
-        const baselogo = document.querySelector('.logo-base');
-        const rgbLogos = [
-            document.querySelector('.logo-red'),
-            document.querySelector('.logo-green'),
-            document.querySelector('.logo-blue')
-        ];
-        const cuts = document.querySelectorAll('.cut');
+        const baselogo = document.getElementById('logo-base');
 
         let isAnimating = false;
 
-        function applyRandomTransform(element) {
-            const offsetX = (Math.random() - 0.5) * 30;
-            const offsetY = (Math.random() - 0.5) * 30;
-            const scale = 0.9 + Math.random() * 0.3;
-            const skewX = (Math.random() - 0.5) * 15;
-            element.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale}) skewX(${skewX}deg)`;
-        }
-
-        async function cutEffect() {
-            const randomCut = cuts[Math.floor(Math.random() * cuts.length)];
-            randomCut.style.animation = 'cutAcross 0.2s linear';
-            await new Promise(resolve => setTimeout(resolve, 200));
-            randomCut.style.animation = '';
-        }
-
-        async function rgbSplitEffect() {
-            // Show all RGB layers
-            rgbLogos.forEach(logo => {
-                logo.classList.add('active');
-                applyRandomTransform(logo);
-            });
-            
-            // Random chance for cut effect
-            if (Math.random() > 0.5) {
-                await cutEffect();
-            }
-            
-            await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
-            
-            // Reset transforms
-            rgbLogos.forEach(logo => {
-                logo.style.transform = '';
-                logo.classList.remove('active');
-            });
-        }
-
         async function glitchEffect() {
-            const duration = 2000; // 2 seconds
-            const startTime = Date.now();
-            
-            // Remove pulse animation
-            logoContainer.style.animation = 'none';
-            
-            while (Date.now() - startTime < duration) {
-                // Hide base logo
-                baselogo.classList.remove('active');
-                
-                // Random glitch sequence
-                for (let i = 0; i < Math.random() * 8 + 5; i++) {
-                    // RGB split effect
-                    await rgbSplitEffect();
-                    
-                    // Random wait between glitches
-                    await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
-                }
-                
-                // Show base logo briefly
-                baselogo.classList.add('active');
-                await new Promise(resolve => setTimeout(resolve, Math.random() * 200 + 100));
+            if (isAnimating) return;
+            isAnimating = true;
+
+            // Remove pulse animation from base logo
+            baselogo.style.animation = 'none';
+            baselogo.classList.remove('active');
+            baselogo.style.display = 'none';
+
+            const glitchSequence = [
+                1, 2, 3, 4, 2,
+                3, 1, 4, 2, 3,
+                1, 4, 2, 3, 1,
+                2, 4, 3, 2, 1
+            ];
+
+            for (let i = 0; i < glitchSequence.length; i++) {
+                logos.forEach(logo => {
+                    logo.style.display = 'none';
+                    logo.classList.remove('active');
+                });
+                logos[glitchSequence[i]].style.display = 'block';
+                logos[glitchSequence[i]].classList.add('active');
+                await new Promise(resolve => setTimeout(resolve, 150));
             }
-            
-            // Ensure base logo is visible at the end
+
+            // Hide all logos
             logos.forEach(logo => {
+                logo.style.display = 'none';
                 logo.classList.remove('active');
-                logo.style.transform = '';
             });
-            baselogo.classList.add('active');
         }
 
         logoContainer.addEventListener('click', async () => {
             if (isAnimating) return;
-            isAnimating = true;
             
             // Start glitch animation
             await glitchEffect();
@@ -305,7 +219,7 @@
             // Switch to white mode
             document.body.classList.add('white-mode');
             
-            // Hide logo
+            // Hide logo container
             logoContainer.style.display = 'none';
             
             // Show text sequence
