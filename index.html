@@ -45,7 +45,8 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 0.1s;
+            mix-blend-mode: screen;
+            transition: all 0.05s linear;
         }
 
         .logo.active {
@@ -54,6 +55,19 @@
 
         .logo-base {
             opacity: 1;
+            mix-blend-mode: normal;
+        }
+
+        .logo-red {
+            filter: url(#red-filter);
+        }
+
+        .logo-green {
+            filter: url(#green-filter);
+        }
+
+        .logo-blue {
+            filter: url(#blue-filter);
         }
 
         .text-content {
@@ -91,12 +105,30 @@
     </style>
 </head>
 <body>
+    <!-- SVG Filters for RGB split effect -->
+    <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <filter id="red-filter">
+                <feColorMatrix type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+                <feOffset dx="3" dy="-2"/>
+            </filter>
+            <filter id="green-filter">
+                <feColorMatrix type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+                <feOffset dx="-2" dy="2"/>
+            </filter>
+            <filter id="blue-filter">
+                <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+                <feOffset dx="1" dy="1"/>
+            </filter>
+        </defs>
+    </svg>
+
     <div class="container">
         <div id="logo-container">
             <img src="logo.svg" class="logo logo-base" alt="InstantReplay Logo">
-            <img src="logo.svg" class="logo logo-glitch-1" alt="InstantReplay Logo Glitch 1" style="filter: hue-rotate(90deg) contrast(150%) brightness(150%);">
-            <img src="logo.svg" class="logo logo-glitch-2" alt="InstantReplay Logo Glitch 2" style="filter: hue-rotate(180deg) contrast(200%) brightness(120%);">
-            <img src="logo.svg" class="logo logo-glitch-3" alt="InstantReplay Logo Glitch 3" style="filter: hue-rotate(270deg) contrast(175%) brightness(140%);">
+            <img src="logo.svg" class="logo logo-red" alt="InstantReplay Logo Red">
+            <img src="logo.svg" class="logo logo-green" alt="InstantReplay Logo Green">
+            <img src="logo.svg" class="logo logo-blue" alt="InstantReplay Logo Blue">
         </div>
         <div class="text-content" id="textContent"></div>
         <div class="cta-buttons" id="ctaButtons">
@@ -122,8 +154,37 @@
         const ctaButtons = document.getElementById('ctaButtons');
         const logos = document.querySelectorAll('.logo');
         const baselogo = document.querySelector('.logo-base');
+        const rgbLogos = [
+            document.querySelector('.logo-red'),
+            document.querySelector('.logo-green'),
+            document.querySelector('.logo-blue')
+        ];
 
         let isAnimating = false;
+
+        function applyRandomTransform(element) {
+            const offsetX = (Math.random() - 0.5) * 20;
+            const offsetY = (Math.random() - 0.5) * 20;
+            const scale = 0.9 + Math.random() * 0.2;
+            const skewX = (Math.random() - 0.5) * 10;
+            element.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale}) skewX(${skewX}deg)`;
+        }
+
+        async function rgbSplitEffect() {
+            // Show all RGB layers
+            rgbLogos.forEach(logo => {
+                logo.classList.add('active');
+                applyRandomTransform(logo);
+            });
+            
+            await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
+            
+            // Reset transforms
+            rgbLogos.forEach(logo => {
+                logo.style.transform = '';
+                logo.classList.remove('active');
+            });
+        }
 
         async function glitchEffect() {
             const duration = 2000; // 2 seconds
@@ -135,17 +196,11 @@
                 
                 // Random glitch sequence
                 for (let i = 0; i < Math.random() * 5 + 3; i++) {
-                    // Show random glitch logo
-                    const randomLogo = logos[Math.floor(Math.random() * logos.length)];
-                    randomLogo.classList.add('active');
-                    randomLogo.style.transform = `translate(${Math.random() * 10 - 5}px, ${Math.random() * 10 - 5}px) scale(${0.9 + Math.random() * 0.2})`;
+                    // RGB split effect
+                    await rgbSplitEffect();
                     
-                    // Wait random time
+                    // Random wait between glitches
                     await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
-                    
-                    // Hide glitch logo
-                    randomLogo.classList.remove('active');
-                    randomLogo.style.transform = '';
                 }
                 
                 // Show base logo briefly
@@ -154,7 +209,10 @@
             }
             
             // Ensure base logo is visible at the end
-            logos.forEach(logo => logo.classList.remove('active'));
+            logos.forEach(logo => {
+                logo.classList.remove('active');
+                logo.style.transform = '';
+            });
             baselogo.classList.add('active');
         }
 
