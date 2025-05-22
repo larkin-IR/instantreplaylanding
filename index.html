@@ -217,21 +217,19 @@
     </div>
 
     <script>
-        const texts = [
-            "Imagine the thrill of thrifting...",
-            "bidding...",
-            "and scoring...",
-            "all in one.",
-            "Too good to be true?",
-            "We will see.",
-            "Blink and you'll miss it.",
-            "Coming soon..."
-        ];
-
         const logoContainer = document.getElementById('logo-container');
         const textContent = document.getElementById('textContent');
         const finalContent = document.getElementById('finalContent');
         const baselogo = document.getElementById('logo-base');
+        const texts = [
+            "Imagine the rush of betting your rent money...",
+            "the joy of scoring a thrift shop masterpiece...",
+            "and the shock of your crush sliding into your DMs...",
+            "all at once.",
+            "Too good to be true?",
+            "We will see...",
+            "coming soon..."
+        ];
 
         let isAnimating = false;
 
@@ -259,7 +257,6 @@
                     currentLogo.style.display = 'block';
                     currentLogo.classList.add('active');
                     
-                    // Gradually increase effect intensity
                     const scale = 1 + (i * 0.02);
                     const brightness = 1 + (i * 0.05);
                     currentLogo.style.transform = `scale(${scale})`;
@@ -269,30 +266,8 @@
                 }
             }
 
-            // Middle phase - increasing intensity
-            for (let i = 0; i < 4; i++) {
-                for (const glitchNum of initialGlitches) {
-                    const currentLogo = document.getElementById(`logo-glitch${glitchNum}`);
-                    document.querySelectorAll('.logo').forEach(logo => {
-                        logo.style.display = 'none';
-                        logo.classList.remove('active');
-                    });
-                    currentLogo.style.display = 'block';
-                    currentLogo.classList.add('active');
-                    currentLogo.classList.add('glitching');
-                    
-                    const scale = 1.1 + (i * 0.05);
-                    const brightness = 1.2 + (i * 0.1);
-                    currentLogo.style.transform = `scale(${scale})`;
-                    currentLogo.style.filter = `brightness(${brightness})`;
-                    
-                    await new Promise(resolve => setTimeout(resolve, 200 - (i * 30)));
-                }
-            }
-
             // Final phase - rapid glitches
             const fastGlitches = [];
-            // Generate a shorter sequence of rapid glitches
             for (let i = 0; i < 30; i++) {
                 fastGlitches.push(Math.floor(Math.random() * 4) + 1);
             }
@@ -307,44 +282,45 @@
                 currentLogo.classList.add('active');
                 currentLogo.classList.add('glitching');
                 
-                // Increase scale and brightness more dramatically
                 const scale = 1.3 + (i * 0.08);
                 const brightness = 1.5 + (i * 0.2);
                 const blur = i * 0.5;
                 currentLogo.style.transform = `scale(${scale})`;
                 currentLogo.style.filter = `brightness(${brightness}) blur(${blur}px)`;
                 
-                // Make it faster
                 await new Promise(resolve => setTimeout(resolve, Math.max(20, 80 - (i * 2))));
             }
 
-            // Immediate flash without pause
+            // Immediate flash
             flash.classList.add('active');
-
-            // Quicker transition to white
             await new Promise(resolve => setTimeout(resolve, 200));
 
             // Switch to white mode and clean up
             document.body.classList.add('white-mode');
             logoContainer.style.opacity = '0';
             logoContainer.style.display = 'none';
-
-            // Shorter pause before starting text sequence
-            await new Promise(resolve => setTimeout(resolve, 800));
             
+            // Reset text content
+            textContent.style.display = 'block';
+            textContent.style.opacity = '0';
+            
+            // Short pause before text
+            await new Promise(resolve => setTimeout(resolve, 800));
+
             // Show text sequence
-            for (let text of texts) {
-                textContent.style.opacity = '0';
+            for (const text of texts) {
                 textContent.textContent = text;
+                textContent.style.opacity = '0';
                 await new Promise(resolve => setTimeout(resolve, 200));
                 textContent.style.opacity = '1';
                 await new Promise(resolve => setTimeout(resolve, 1500));
             }
-            
-            // Hide text content and show final content
+
+            // Hide text and show final content
             textContent.style.opacity = '0';
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
+            await new Promise(resolve => setTimeout(resolve, 500));
+            textContent.style.display = 'none';
+
             // Show final content
             finalContent.innerHTML = `
                 <h2>Want first dibs on what's coming?</h2>
@@ -362,6 +338,7 @@
 
         // Only start on click, remove auto-start
         document.addEventListener('DOMContentLoaded', () => {
+            textContent.style.display = 'none';
             finalContent.style.opacity = '0';
             finalContent.style.display = 'none';
         });
