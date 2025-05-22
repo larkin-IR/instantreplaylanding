@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstantReplay - The Future of Fashion Liquidation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo {
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            filter: brightness(1.2);
+            animation: shake 0.5s infinite;
+        }
+
+        .hidden {
+            display: none;
+            opacity: 0;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-5px, 0); }
+            50% { transform: translate(5px, 0); }
+            75% { transform: translate(-5px, 0); }
+            100% { transform: translate(0, 0); }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); }
+            40% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            100% { transform: translate(0); }
+        }
+
+        .text-content {
+            position: absolute;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .cta-buttons {
+            display: none;
+            gap: 20px;
+        }
+
+        .cta-button {
+            padding: 15px 30px;
+            border: 2px solid #fff;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+
+        .cta-button:hover {
+            background: #fff;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="InstantReplay Logo" class="logo" id="mainLogo">
+        <div class="text-content" id="textContent"></div>
+        <div class="cta-buttons" id="ctaButtons">
+            <button class="cta-button" id="brandButton">I'm a Brand</button>
+            <button class="cta-button" id="playerButton">I'm a Player</button>
+        </div>
+    </div>
+
+    <script>
+        const texts = [
+            "Imagine the thrill of thrifting...",
+            "bidding...",
+            "and scoring...",
+            "all in one.",
+            "Too good to be true?",
+            "We will see.",
+            "Blink and you'll miss it.",
+            "Coming soon..."
+        ];
+
+        const logo = document.getElementById('mainLogo');
+        const textContent = document.getElementById('textContent');
+        const ctaButtons = document.getElementById('ctaButtons');
+
+        let isAnimating = false;
+
+        logo.addEventListener('click', async () => {
+            if (isAnimating) return;
+            isAnimating = true;
+            
+            // Start glitch animation
+            logo.style.animation = 'glitch 0.3s infinite';
+            
+            // Wait 2 seconds
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Flash white
+            const flash = document.createElement('div');
+            flash.style.position = 'fixed';
+            flash.style.top = '0';
+            flash.style.left = '0';
+            flash.style.width = '100vw';
+            flash.style.height = '100vh';
+            flash.style.backgroundColor = '#fff';
+            flash.style.transition = 'opacity 1s';
+            document.body.appendChild(flash);
+            
+            // Hide logo
+            logo.style.display = 'none';
+            
+            // Wait 1 second
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Fade out flash
+            flash.style.opacity = '0';
+            
+            // Show text sequence
+            for (let text of texts) {
+                textContent.style.opacity = '0';
+                textContent.textContent = text;
+                textContent.style.opacity = '1';
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+            
+            // Remove flash element
+            flash.remove();
+            
+            // Show final logo and buttons
+            logo.style.animation = '';
+            logo.style.display = 'block';
+            ctaButtons.style.display = 'flex';
+            
+            isAnimating = false;
+        });
+    </script>
+</body>
+</html> 
