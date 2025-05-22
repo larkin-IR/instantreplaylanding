@@ -64,6 +64,7 @@
             display: block;
             animation: pulse 2s infinite;
             filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+            cursor: pointer;
         }
 
         @keyframes pulse {
@@ -100,19 +101,25 @@
             position: absolute;
             text-align: center;
             opacity: 0;
-            transition: opacity 1s ease;
-            font-size: 32px;
-            text-shadow: none;
+            transition: opacity 0.5s ease;
+            font-size: 42px;
+            font-weight: 300;
             width: 100%;
             padding: 0 20px;
             pointer-events: none;
             z-index: 100;
             color: #000;
+            top: 50%;
+            transform: translateY(-50%);
+            max-width: 1000px;
+            margin: 0 auto;
+            left: 0;
+            right: 0;
         }
 
         .final-content {
-            position: absolute;
-            bottom: 25vh;
+            position: fixed;
+            bottom: 25%;
             left: 0;
             width: 100%;
             text-align: center;
@@ -122,40 +129,36 @@
             flex-direction: column;
             align-items: center;
             gap: 30px;
+            color: #000;
         }
 
         .final-content h2 {
             font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        .final-content p {
-            font-size: 24px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            font-weight: 300;
         }
 
         .cta-buttons {
             display: flex;
-            gap: 20px;
+            gap: 30px;
+            margin-top: 20px;
         }
 
         .cta-button {
-            padding: 15px 30px;
+            padding: 15px 40px;
             border: 2px solid #000;
             background: transparent;
             color: #000;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 18px;
+            font-size: 20px;
             text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
+            letter-spacing: 1px;
         }
 
         .cta-button:hover {
             background: #000;
             color: #fff;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -206,7 +209,6 @@
         <div class="text-content" id="textContent"></div>
         <div class="final-content" id="finalContent">
             <h2>Want first dibs on what's coming?</h2>
-            <p>Contact us</p>
             <div class="cta-buttons">
                 <button class="cta-button" id="brandButton">I'm a Brand</button>
                 <button class="cta-button" id="playerButton">I'm a Player</button>
@@ -290,8 +292,8 @@
 
             // Final phase - rapid glitches
             const fastGlitches = [];
-            // Generate a longer sequence of rapid glitches
-            for (let i = 0; i < 60; i++) {
+            // Generate a shorter sequence of rapid glitches
+            for (let i = 0; i < 30; i++) {
                 fastGlitches.push(Math.floor(Math.random() * 4) + 1);
             }
 
@@ -306,21 +308,21 @@
                 currentLogo.classList.add('glitching');
                 
                 // Increase scale and brightness more dramatically
-                const scale = 1.3 + (i * 0.05);
-                const brightness = 1.5 + (i * 0.15);
-                const blur = i * 0.4;
+                const scale = 1.3 + (i * 0.08);
+                const brightness = 1.5 + (i * 0.2);
+                const blur = i * 0.5;
                 currentLogo.style.transform = `scale(${scale})`;
                 currentLogo.style.filter = `brightness(${brightness}) blur(${blur}px)`;
                 
-                // Make it faster as it progresses
-                await new Promise(resolve => setTimeout(resolve, Math.max(20, 100 - (i * 1.5))));
+                // Make it faster
+                await new Promise(resolve => setTimeout(resolve, Math.max(20, 80 - (i * 2))));
             }
 
             // Immediate flash without pause
             flash.classList.add('active');
 
-            // Quick transition to white
-            await new Promise(resolve => setTimeout(resolve, 300));
+            // Quicker transition to white
+            await new Promise(resolve => setTimeout(resolve, 200));
 
             // Switch to white mode and clean up
             document.body.classList.add('white-mode');
@@ -328,27 +330,15 @@
             logoContainer.style.display = 'none';
 
             // Shorter pause before starting text sequence
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Show text sequence with proper fashion-focused content
-            const texts = [
-                "Imagine the thrill of thrifting...",
-                "The rush of bidding...",
-                "The satisfaction of scoring...",
-                "All in one place.",
-                "Too good to be true?",
-                "We will see.",
-                "Blink and you'll miss it.",
-                "Coming soon..."
-            ];
+            await new Promise(resolve => setTimeout(resolve, 800));
             
             // Show text sequence
             for (let text of texts) {
                 textContent.style.opacity = '0';
                 textContent.textContent = text;
-                await new Promise(resolve => setTimeout(resolve, 300));
+                await new Promise(resolve => setTimeout(resolve, 200));
                 textContent.style.opacity = '1';
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise(resolve => setTimeout(resolve, 1500));
             }
             
             // Hide text content and show final content
@@ -356,6 +346,13 @@
             await new Promise(resolve => setTimeout(resolve, 1000));
             
             // Show final content
+            finalContent.innerHTML = `
+                <h2>Want first dibs on what's coming?</h2>
+                <div class="cta-buttons">
+                    <button class="cta-button" id="brandButton">I'm a Brand</button>
+                    <button class="cta-button" id="playerButton">I'm a Player</button>
+                </div>
+            `;
             finalContent.style.display = 'flex';
             await new Promise(resolve => setTimeout(resolve, 100));
             finalContent.style.opacity = '1';
@@ -363,9 +360,10 @@
             isAnimating = false;
         }
 
-        // Start animation automatically and allow click to restart
+        // Only start on click, remove auto-start
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(glitchEffect, 1000);
+            finalContent.style.opacity = '0';
+            finalContent.style.display = 'none';
         });
         logoContainer.addEventListener('click', glitchEffect);
     </script>
