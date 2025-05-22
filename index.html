@@ -31,75 +31,29 @@
             align-items: center;
         }
 
-        .logo {
+        #logo-container {
+            position: relative;
             width: 200px;
             height: 200px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-            position: relative;
         }
 
-        .logo:hover {
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
-            animation: shake 0.5s infinite;
-        }
-
-        .logo.glitching {
-            animation: none;
-        }
-
-        .logo.glitching::before,
-        .logo.glitching::after {
-            content: '';
+        .logo {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('logo.svg') no-repeat center center;
-            background-size: contain;
-            mix-blend-mode: screen;
+            opacity: 0;
+            transition: opacity 0.1s;
         }
 
-        .logo.glitching::before {
-            animation: glitch-1 0.2s infinite;
-            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-            transform: translate(-5px);
-            opacity: 0.75;
+        .logo.active {
+            opacity: 1;
         }
 
-        .logo.glitching::after {
-            animation: glitch-2 0.3s infinite alternate-reverse;
-            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
-            transform: translate(5px);
-            opacity: 0.75;
-        }
-
-        @keyframes glitch-1 {
-            0% { transform: translate(0); }
-            20% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
-            40% { transform: translate(-5px, -5px); filter: hue-rotate(180deg); }
-            60% { transform: translate(5px, 5px); filter: hue-rotate(270deg); }
-            80% { transform: translate(5px, -5px); filter: hue-rotate(360deg); }
-            100% { transform: translate(0); }
-        }
-
-        @keyframes glitch-2 {
-            0% { transform: translate(0); }
-            20% { transform: translate(5px, -5px); filter: hue-rotate(-90deg); }
-            40% { transform: translate(5px, 5px); filter: hue-rotate(-180deg); }
-            60% { transform: translate(-5px, -5px); filter: hue-rotate(-270deg); }
-            80% { transform: translate(-5px, 5px); filter: hue-rotate(-360deg); }
-            100% { transform: translate(0); }
-        }
-
-        @keyframes shake {
-            0% { transform: translate(0, 0); }
-            25% { transform: translate(-5px, 0); }
-            50% { transform: translate(5px, 0); }
-            75% { transform: translate(-5px, 0); }
-            100% { transform: translate(0, 0); }
+        .logo-base {
+            opacity: 1;
         }
 
         .text-content {
@@ -138,7 +92,12 @@
 </head>
 <body>
     <div class="container">
-        <img src="logo.svg" alt="InstantReplay Logo" class="logo" id="mainLogo">
+        <div id="logo-container">
+            <img src="logo.svg" class="logo logo-base" alt="InstantReplay Logo">
+            <img src="logo.svg" class="logo logo-glitch-1" alt="InstantReplay Logo Glitch 1" style="filter: hue-rotate(90deg) contrast(150%) brightness(150%);">
+            <img src="logo.svg" class="logo logo-glitch-2" alt="InstantReplay Logo Glitch 2" style="filter: hue-rotate(180deg) contrast(200%) brightness(120%);">
+            <img src="logo.svg" class="logo logo-glitch-3" alt="InstantReplay Logo Glitch 3" style="filter: hue-rotate(270deg) contrast(175%) brightness(140%);">
+        </div>
         <div class="text-content" id="textContent"></div>
         <div class="cta-buttons" id="ctaButtons">
             <button class="cta-button" id="brandButton">I'm a Brand</button>
@@ -158,26 +117,48 @@
             "Coming soon..."
         ];
 
-        const logo = document.getElementById('mainLogo');
+        const logoContainer = document.getElementById('logo-container');
         const textContent = document.getElementById('textContent');
         const ctaButtons = document.getElementById('ctaButtons');
+        const logos = document.querySelectorAll('.logo');
+        const baselogo = document.querySelector('.logo-base');
 
         let isAnimating = false;
 
         async function glitchEffect() {
             const duration = 2000; // 2 seconds
-            const interval = 100; // Glitch every 100ms
             const startTime = Date.now();
             
             while (Date.now() - startTime < duration) {
-                logo.classList.add('glitching');
-                await new Promise(resolve => setTimeout(resolve, Math.random() * 50 + 50));
-                logo.classList.remove('glitching');
-                await new Promise(resolve => setTimeout(resolve, Math.random() * 50 + 50));
+                // Hide base logo
+                baselogo.classList.remove('active');
+                
+                // Random glitch sequence
+                for (let i = 0; i < Math.random() * 5 + 3; i++) {
+                    // Show random glitch logo
+                    const randomLogo = logos[Math.floor(Math.random() * logos.length)];
+                    randomLogo.classList.add('active');
+                    randomLogo.style.transform = `translate(${Math.random() * 10 - 5}px, ${Math.random() * 10 - 5}px) scale(${0.9 + Math.random() * 0.2})`;
+                    
+                    // Wait random time
+                    await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
+                    
+                    // Hide glitch logo
+                    randomLogo.classList.remove('active');
+                    randomLogo.style.transform = '';
+                }
+                
+                // Show base logo briefly
+                baselogo.classList.add('active');
+                await new Promise(resolve => setTimeout(resolve, Math.random() * 200 + 100));
             }
+            
+            // Ensure base logo is visible at the end
+            logos.forEach(logo => logo.classList.remove('active'));
+            baselogo.classList.add('active');
         }
 
-        logo.addEventListener('click', async () => {
+        logoContainer.addEventListener('click', async () => {
             if (isAnimating) return;
             isAnimating = true;
             
@@ -196,7 +177,7 @@
             document.body.appendChild(flash);
             
             // Hide logo
-            logo.style.display = 'none';
+            logoContainer.style.display = 'none';
             
             // Wait 1 second
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -216,7 +197,7 @@
             flash.remove();
             
             // Show final logo and buttons
-            logo.style.display = 'block';
+            logoContainer.style.display = 'block';
             ctaButtons.style.display = 'flex';
             
             isAnimating = false;
