@@ -98,7 +98,7 @@
         }
 
         .text-content {
-            position: absolute;
+            position: fixed;
             text-align: center;
             opacity: 0;
             transition: opacity 0.5s ease;
@@ -107,7 +107,7 @@
             width: 100%;
             padding: 0 20px;
             pointer-events: none;
-            z-index: 100;
+            z-index: 2000;
             color: #000;
             top: 50%;
             transform: translateY(-50%);
@@ -115,6 +115,7 @@
             margin: 0 auto;
             left: 0;
             right: 0;
+            background: transparent;
         }
 
         .final-content {
@@ -300,19 +301,22 @@
             logoContainer.style.opacity = '0';
             logoContainer.style.display = 'none';
             
-            // Reset text content
+            // Reset and show text container
             textContent.style.display = 'block';
-            textContent.style.opacity = '0';
+            textContent.style.visibility = 'visible';
+            textContent.style.zIndex = '2000';
             
             // Short pause before text
             await new Promise(resolve => setTimeout(resolve, 800));
 
             // Show text sequence
             for (const text of texts) {
+                console.log('Showing text:', text);
                 textContent.textContent = text;
                 textContent.style.opacity = '0';
                 await new Promise(resolve => setTimeout(resolve, 200));
                 textContent.style.opacity = '1';
+                console.log('Text should be visible now');
                 await new Promise(resolve => setTimeout(resolve, 1500));
             }
 
@@ -330,6 +334,7 @@
                 </div>
             `;
             finalContent.style.display = 'flex';
+            finalContent.style.zIndex = '2000';
             await new Promise(resolve => setTimeout(resolve, 100));
             finalContent.style.opacity = '1';
             
@@ -338,7 +343,11 @@
 
         // Only start on click, remove auto-start
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize text container
             textContent.style.display = 'none';
+            textContent.style.opacity = '0';
+            
+            // Initialize final content
             finalContent.style.opacity = '0';
             finalContent.style.display = 'none';
         });
