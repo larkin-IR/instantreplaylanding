@@ -37,6 +37,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            position: relative;
         }
 
         .logo:hover {
@@ -44,14 +45,53 @@
             animation: shake 0.5s infinite;
         }
 
-        .logo svg {
-            width: 100%;
-            height: 100%;
+        .logo.glitching {
+            animation: none;
         }
 
-        .hidden {
-            display: none;
-            opacity: 0;
+        .logo.glitching::before,
+        .logo.glitching::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('logo.svg') no-repeat center center;
+            background-size: contain;
+            mix-blend-mode: screen;
+        }
+
+        .logo.glitching::before {
+            animation: glitch-1 0.2s infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+            transform: translate(-5px);
+            opacity: 0.75;
+        }
+
+        .logo.glitching::after {
+            animation: glitch-2 0.3s infinite alternate-reverse;
+            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+            transform: translate(5px);
+            opacity: 0.75;
+        }
+
+        @keyframes glitch-1 {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); filter: hue-rotate(90deg); }
+            40% { transform: translate(-5px, -5px); filter: hue-rotate(180deg); }
+            60% { transform: translate(5px, 5px); filter: hue-rotate(270deg); }
+            80% { transform: translate(5px, -5px); filter: hue-rotate(360deg); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes glitch-2 {
+            0% { transform: translate(0); }
+            20% { transform: translate(5px, -5px); filter: hue-rotate(-90deg); }
+            40% { transform: translate(5px, 5px); filter: hue-rotate(-180deg); }
+            60% { transform: translate(-5px, -5px); filter: hue-rotate(-270deg); }
+            80% { transform: translate(-5px, 5px); filter: hue-rotate(-360deg); }
+            100% { transform: translate(0); }
         }
 
         @keyframes shake {
@@ -60,15 +100,6 @@
             50% { transform: translate(5px, 0); }
             75% { transform: translate(-5px, 0); }
             100% { transform: translate(0, 0); }
-        }
-
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-5px, 5px); }
-            40% { transform: translate(-5px, -5px); }
-            60% { transform: translate(5px, 5px); }
-            80% { transform: translate(5px, -5px); }
-            100% { transform: translate(0); }
         }
 
         .text-content {
@@ -133,15 +164,25 @@
 
         let isAnimating = false;
 
+        async function glitchEffect() {
+            const duration = 2000; // 2 seconds
+            const interval = 100; // Glitch every 100ms
+            const startTime = Date.now();
+            
+            while (Date.now() - startTime < duration) {
+                logo.classList.add('glitching');
+                await new Promise(resolve => setTimeout(resolve, Math.random() * 50 + 50));
+                logo.classList.remove('glitching');
+                await new Promise(resolve => setTimeout(resolve, Math.random() * 50 + 50));
+            }
+        }
+
         logo.addEventListener('click', async () => {
             if (isAnimating) return;
             isAnimating = true;
             
             // Start glitch animation
-            logo.style.animation = 'glitch 0.3s infinite';
-            
-            // Wait 2 seconds
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            await glitchEffect();
             
             // Flash white
             const flash = document.createElement('div');
@@ -175,7 +216,6 @@
             flash.remove();
             
             // Show final logo and buttons
-            logo.style.animation = '';
             logo.style.display = 'block';
             ctaButtons.style.display = 'flex';
             
